@@ -43,6 +43,7 @@ defmodule Issues.CLI do
   def process({user, project, _count}) do
     Issues.GithubIssues.fetch(user, project)
     |> decode_response
+    |> sort_into_ascending_order
   end
 
   def decode_response({:ok, body}), do: body
@@ -50,5 +51,10 @@ defmodule Issues.CLI do
     message = error["message"]
     IO.puts "Error fetching from github: #{message}"
     System.halt(2)
+  end
+
+  def sort_into_ascending_order(list_of_issues) do
+    Enum.sort list_of_issues,
+      fn i1, i2 -> Map.get(i1, "created_at") <= Map.get(i2, "created_at") end
   end
 end

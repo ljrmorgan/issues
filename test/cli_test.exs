@@ -2,7 +2,7 @@ defmodule CLITest do
   use ExUnit.Case
   doctest Issues
 
-  import Issues.CLI, only: [parse_args: 1]
+  import Issues.CLI, only: [parse_args: 1, sort_into_ascending_order: 1]
 
   describe "Argument parser" do
     test "returns :help if not enough options provided" do
@@ -22,5 +22,15 @@ defmodule CLITest do
     test "defaults count when two options given" do
       assert parse_args(["user", "project"]) == {"user", "project", 4}
     end
+  end
+
+  test "sort orders correctly" do
+    result = sort_into_ascending_order(fake_created_at_list(["c", "a", "b"]))
+    issues = for issue <- result, do: Map.get(issue, "created_at")
+    assert issues == ~w{a b c}
+  end
+
+  defp fake_created_at_list(values) do
+    for value <- values, do: %{"created_at" => value, "other_data" => "xxx"}
   end
 end
